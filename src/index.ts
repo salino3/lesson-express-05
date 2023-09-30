@@ -1,3 +1,6 @@
+// npm install mongoose --save
+// npm install mongodb@5 --save
+
 import '#core/load-env.js';
 import express from 'express';
 import path from 'path';
