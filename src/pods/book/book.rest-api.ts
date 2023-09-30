@@ -24,10 +24,15 @@ booksApi
     try {
       const { id } = req.params;
       const book = await bookRepository.getBook(id);
-      res.send(mapBookFromModelToApi(book));
+
+      if (book) {
+        res.send(mapBookFromModelToApi(book));
+      } else {
+        res.sendStatus(404);
+      };
     } catch (error) {
       next(error);
-    }
+    };
   })
   .post("/", async (req, res, next) => {
     try {
@@ -41,9 +46,14 @@ booksApi
   .put("/:id", async (req, res, next) => {
     try {
       const { id } = req.params;
-      const book = mapBookFromApiToModel({ ...req.body, id });
-      await bookRepository.saveBook(book);
-      res.sendStatus(204);
+
+      if(await bookRepository.getBook(id)){
+        const book = mapBookFromApiToModel({ ...req.body, id });
+        await bookRepository.saveBook(book);
+        res.sendStatus(204);
+      }else{
+        res.sendStatus(404);
+      }
     } catch (error) {
       next(error);
     }
@@ -51,9 +61,10 @@ booksApi
   .delete("/:id", async (req, res, next) => {
     try {
       const { id } = req.params;
-      await bookRepository.deleteBook(id);
-      res.sendStatus(204);
+      const isDeleted = await bookRepository.deleteBook(id);
+
+     res.sendStatus(isDeleted ? 204 : 404);
     } catch (error) {
       next(error);
-    }
+    };
   });
